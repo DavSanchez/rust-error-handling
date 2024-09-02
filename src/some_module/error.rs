@@ -1,3 +1,4 @@
+use std::backtrace::Backtrace;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -6,6 +7,18 @@ pub enum SomeModuleError {
     OpA(String),
     #[error("Encountered error B with value `{0}` :: usize")]
     OpB(usize),
-    #[error("Encountered error C with values \"{0}\" :: String and `{1}` :: usize")]
-    OpC(String, usize),
+    #[error("Encountered error C: {op}")]
+    OpC {
+        #[from]
+        #[backtrace]
+        op: OpC,
+    },
+}
+
+#[derive(Debug, Error)]
+#[error("Values a: {a}, b: {b}")]
+pub struct OpC {
+    pub a: String,
+    pub b: usize,
+    pub backtrace: Backtrace,
 }
